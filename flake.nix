@@ -59,7 +59,7 @@
         dbname = "shopware";
         dbuser = "shopware";
         dbpass = "shopware";
-        dbhost = "127.0.0.1";
+        dbhost = "0.0.0.0";
         dbport = "3306";
         phpfpmport = "9123";
         redisport = "7777";
@@ -71,7 +71,6 @@
             node
             box
             redis
-            redisport
             php
             nginx
             maria
@@ -96,7 +95,7 @@
           CYPRESS_dbName = dbname;
           APP_URL = "http://localhost:8000";
           APP_SECRET = "devsecret";
-          DATABASE_URL = "mysql://root@localhost:3306/shopware";
+          DATABASE_URL = "mysql://${dbuser}@${dbhost}:${dbport}/${dbname}";
           shellHook = "
             #env setup
             export HOME=$PWD
@@ -180,13 +179,13 @@
             runsvdir services &
             RUNSVDIRPID=$!
             trap 'sv stop redis && sv stop nginx && sv stop phpfpm && sv stop mariadb && kill -SIGHUP $RUNSVDIRPID' EXIT
-
+            sv status mariadb
+            sleep 5
             #shopware install
             if ! [ -e .dbcreated ]; then 
-              mysql -S$HOME/mariadb/tmp/mysql.sock -u$USER --execute 'CREATE DATABASE IF NOT EXISTS ${dbname};'
-              mysql -S$HOME/mariadb/tmp/mysql.sock -u$USER --execute \"CREATE USER IF NOT EXISTS '${dbuser}'@'localhost' IDENTIFIED BY '${dbpass}'\"
-              mysql -S$HOME/mariadb/tmp/mysql.sock -u$USER --execute \"GRANT ALL PRIVILEGES ON *.* TO '${dbuser}'@'localhost';\"
-              touch .dbcreated
+              mysql -S $HOME/mariadb/tmp/mysql.sock -u $USER --execute 'CREATE DATABASE IF NOT EXISTS ${dbname};'
+              mysql -S $HOME/mariadb/tmp/mysql.sock -u $USER --execute \"CREATE USER IF NOT EXISTS '${dbuser}'@'localhost' IDENTIFIED BY '${dbpass}'\"
+              mysql -S $HOME/mariadb/tmp/mysql.sock -u $USER --execute \"GRANT ALL PRIVILEGES ON *.* TO '${dbuser}'@'localhost';\" && touch .dbcreated
             fi
 
             #install shopware

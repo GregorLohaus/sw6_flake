@@ -1,7 +1,8 @@
 {
   description = "A very basic flake";
   inputs = { 
-    nixpkgs.url = "github:nixos/nixpkgs"; 
+    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs-old.url = "github:nixos/nixpkgs/a5c9c6373aa35597cd5a17bc5c013ed0ca462cf0";
     flake-utils.url = "github:numtide/flake-utils";
     phps.url = "github:fossar/nix-phps";  
     shopware = {
@@ -41,10 +42,12 @@
       flake = false;
     };
   };
-  outputs = { self, nixpkgs, flake-utils, phps, shopware, nginxconfshopware,redisconf,redisservice, mariadbcnf, mariadbservice, nginxservice, phpfpmconf, phpfpmservice}: 
+  outputs = { self, nixpkgs, nixpkgs-old,  flake-utils, phps, shopware, nginxconfshopware,redisconf,redisservice, mariadbcnf, mariadbservice, nginxservice, phpfpmconf, phpfpmservice}: 
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        maria1008 = ( import nixpkgs-old { inherit system;}).pkgs;
+        maria1008overlay = self: super: { mariadb = maria1008.legacyPackages.${system}.mariadb; };
+        pkgs = (import nixpkgs { inherit system; overlays = [maria1008overlay]; }).pkgs;
         node = pkgs.nodejs_18;
         watchexec = pkgs.watchexec;
         redis = pkgs.redis;
@@ -95,7 +98,7 @@
           CYPRESS_dbName = dbname;
           APP_URL = "http://localhost:8000";
           APP_SECRET = "devsecret";
-          DATABASE_URL = "mysql://${dbuser}@${dbhost}:${dbport}/${dbname}";
+          DATABASE_URL = "mysql://${dbuser}:${dbpass}@${dbhost}:${dbport}/${dbname}";
           shellHook = "
             #env setup
             export HOME=$PWD
@@ -191,10 +194,11 @@
             #install shopware
             if ! [ -e .shopwareinstalled ]; then
               cp -r -f ${shopware}/. $HOME/
+              composer install
               #${box}/bin/box compile -d src/WebInstaller
               #mv src/WebInstaller/shopware-installer.phar.php shop/public/shopware-installer.phar.php
               #${watchexec}/bin/watchexec -i src/WebInstaller/shopware-installer.phar.php  -eyaml,php,js build-updater
-              bin/console system:install --basic-setup --force
+              php -d memory_limit=6G bin/console system:install --basic-setup --force
             fi
           ";
         };

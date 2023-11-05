@@ -1,3 +1,4 @@
 *
 !flake.nix
 !flake.lock
+!clearflake.sh

@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "dotenv": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699208147,
+        "narHash": "sha256-4w5MioVTdYPYAr7qGtd7SdHV21OjcxJplOVNIoot868=",
+        "owner": "GregorLohaus",
+        "repo": "dot_env_for_sw6_flake",
+        "rev": "686da34dd8e7857e1e27fb7b740defbdeea1f51a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GregorLohaus",
+        "ref": "sw-v-6-5-0-0",
+        "repo": "dot_env_for_sw6_flake",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -71,11 +88,11 @@
     "nginxconfshopware": {
       "flake": false,
       "locked": {
-        "lastModified": 1694612349,
-        "narHash": "sha256-IKLxl5bK2SOzUSOMZ8yDatKHt1csOHc2ljJO53stRos=",
+        "lastModified": 1699204426,
+        "narHash": "sha256-v5x3pR1Cfp6sPhPZTUCT1ouzafeDAr8pLmbseVda6iw=",
         "owner": "GregorLohaus",
         "repo": "nginx_conf_for_sw_flakes",
-        "rev": "e638ae01be01424f0261e5854093af87ab0ce44b",
+        "rev": "5038a6d5cdbf6318bf192615caf485109e560e99",
         "type": "github"
       },
       "original": {
@@ -223,6 +240,7 @@
     },
     "root": {
       "inputs": {
+        "dotenv": "dotenv",
         "flake-utils": "flake-utils",
         "mariadbcnf": "mariadbcnf",
         "mariadbservice": "mariadbservice",
@@ -243,14 +261,14 @@
         "lastModified": 1683099466,
         "narHash": "sha256-83rFG/LQEP7YxAnxgcNZak6YersUAbCspkDCa5mc5pQ=",
         "owner": "shopware",
-        "repo": "platform",
+        "repo": "shopware",
         "rev": "50e31d3f617ac6b57d5134d7f4b294f6c8ddd8f2",
         "type": "github"
       },
       "original": {
         "owner": "shopware",
         "ref": "v6.5.0.0",
-        "repo": "platform",
+        "repo": "shopware",
         "type": "github"
       }
     },

@@ -24,5 +24,14 @@ rm -r var
 rm -r vendor
 rm -r .cache
 rm -r .config
+rm -r files
 rm -r .local
 rm phpstan.neon.dist
+rm .rnd
+rm qodana.yaml
+rm phpstan-v66-baseline.neon
+rm .mysql_history
+rm .dbcreated
+rm install.lock
+rm .env
+rm .shopwareinstalled

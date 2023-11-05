@@ -2,15 +2,18 @@
   description = "A very basic flake";
   inputs = { 
     nixpkgs.url = "github:nixos/nixpkgs";
-    nixpkgs-old.url = "github:nixos/nixpkgs/a5c9c6373aa35597cd5a17bc5c013ed0ca462cf0";
     flake-utils.url = "github:numtide/flake-utils";
     phps.url = "github:fossar/nix-phps";  
     shopware = {
-      url = "github:shopware/platform?ref=v6.5.0.0";
+      url = "github:shopware/shopware?ref=v6.5.0.0";
       flake = false;
     };
     nginxconfshopware = {
       url = "github:GregorLohaus/nginx_conf_for_sw_flakes?ref=sw-v-6-5-0-0";
+      flake = false;
+    };
+    dotenv = {
+      url = "github:GregorLohaus/dot_env_for_sw6_flake?ref=sw-v-6-5-0-0";
       flake = false;
     };
     redisconf = {
@@ -42,12 +45,10 @@
       flake = false;
     };
   };
-  outputs = { self, nixpkgs, nixpkgs-old,  flake-utils, phps, shopware, nginxconfshopware,redisconf,redisservice, mariadbcnf, mariadbservice, nginxservice, phpfpmconf, phpfpmservice}: 
+  outputs = { self, nixpkgs, flake-utils, phps, shopware, nginxconfshopware,redisconf,redisservice, mariadbcnf, mariadbservice, nginxservice, phpfpmconf, dotenv, phpfpmservice}: 
     flake-utils.lib.eachDefaultSystem (system:
       let
-        maria1008 = ( import nixpkgs-old { inherit system;}).pkgs;
-        maria1008overlay = self: super: { mariadb = maria1008.legacyPackages.${system}.mariadb; };
-        pkgs = (import nixpkgs { inherit system; overlays = [maria1008overlay]; }).pkgs;
+        pkgs = nixpkgs.legacyPackages.${system};
         node = pkgs.nodejs_18;
         watchexec = pkgs.watchexec;
         redis = pkgs.redis;
@@ -55,7 +56,7 @@
         composer = phps.packages.${system}.php82.packages.composer;
         box = phps.packages.${system}.php82.packages.box;
         nginx = pkgs.nginx;
-        maria = pkgs.mariadb;
+        maria = pkgs.mysql80;
         envsubst = pkgs.envsubst;
         runit = pkgs.runit;
         sd = pkgs.sd;
@@ -82,6 +83,7 @@
             composer
             sd
           ];
+          SHOPWARE_SRC=shopware;
           NGINX_PATH = nginx;
           HOSTNAME = hostname;
           DBPASS = dbpass;
@@ -96,12 +98,13 @@
           CYPRESS_dbUser = dbuser;
           CYPRESS_dbPassword = dbpass;
           CYPRESS_dbName = dbname;
-          APP_URL = "http://localhost:8000";
+          APP_URL = "http://localhost:8080";
           APP_SECRET = "devsecret";
           DATABASE_URL = "mysql://${dbuser}:${dbpass}@${dbhost}:${dbport}/${dbname}";
           shellHook = "
             #env setup
             export HOME=$PWD
+            export XDG_HOME=$PWD
             export SVDIR=$HOME/services
             mkdir -p services
             chmod -R 755 .
@@ -193,12 +196,32 @@
 
             #install shopware
             if ! [ -e .shopwareinstalled ]; then
-              cp -r -f ${shopware}/. $HOME/
+              cp -r ${shopware}/. $HOME/
+              cat ${dotenv}/.env | envsubst > .env
+              mkdir var
+              mkdir files
+              chmod -R 755 public
+              chmod -R 755 config
+              chmod -R 755 var
+              chmod -R 755 files
+              chmod -R 755 src
               composer install
-              #${box}/bin/box compile -d src/WebInstaller
-              #mv src/WebInstaller/shopware-installer.phar.php shop/public/shopware-installer.phar.php
-              #${watchexec}/bin/watchexec -i src/WebInstaller/shopware-installer.phar.php  -eyaml,php,js build-updater
-              php -d memory_limit=6G bin/console system:install --basic-setup --force
+              composer install --working-dir=$HOME/src/WebInstaller
+              php -d memory_limit=6G bin/console system:install --basic-setup --create-database --force
+              bin/console bundle:dump
+              npm --prefix src/Administration/Resources/app/administration/ install
+              PROJECT_ROOT=$HOME ENV_FILE=$HOME/.env npm run --prefix src/Administration/Resources/app/administration/ build
+              npm --prefix src/Storefront/Resources/app/storefront install
+              PROJECT_ROOT=$HOME ENV_FILE=$HOME/.env npm run --prefix src/Storefront/Resources/app/storefront development
+              node src/Storefront/Resources/app/storefront/copy-to-vendor.js
+              bin/console assets:install
+              touch .shopwareinstalled 
+            fi
+            if [ -e config/jwt/public.pem ]; then
+              chmod 660 config/jwt/public.pem 
+            fi
+            if [ -e config/jwt/private.pem ]; then
+              chmod 660 config/jwt/private.pem 
             fi
           ";
         };

@@ -1,4 +1,5 @@
 *
-!flake.nix
-!flake.lock
+!.gitignore
 !clearflake.sh
+!flake.lock
+!flake.nix

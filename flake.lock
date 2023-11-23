@@ -258,16 +258,16 @@
     "shopware": {
       "flake": false,
       "locked": {
-        "lastModified": 1683099466,
-        "narHash": "sha256-83rFG/LQEP7YxAnxgcNZak6YersUAbCspkDCa5mc5pQ=",
+        "lastModified": 1683195168,
+        "narHash": "sha256-xn/4sFQkGGI3p/7I5Wev8If/5dR8mFqhm6klycbTnfM=",
         "owner": "shopware",
         "repo": "shopware",
-        "rev": "50e31d3f617ac6b57d5134d7f4b294f6c8ddd8f2",
+        "rev": "c59aacc6a7c91aeeb7f89c122ea401442ca63fbc",
         "type": "github"
       },
       "original": {
         "owner": "shopware",
-        "ref": "v6.5.0.0",
+        "ref": "v6.4.20.2",
         "repo": "shopware",
         "type": "github"
       }

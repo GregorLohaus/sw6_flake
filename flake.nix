@@ -5,7 +5,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     phps.url = "github:fossar/nix-phps";  
     shopware = {
-      url = "github:shopware/shopware?ref=v6.5.0.0";
+      url = "github:shopware/shopware?ref=v6.4.20.2";
       flake = false;
     };
     nginxconfshopware = {
@@ -49,7 +49,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        node = pkgs.nodejs_18;
+        node = pkgs.nodejs_16.overrideAttrs (o: {meta = o.meta // {knownVulnerabilities = [];};});
         watchexec = pkgs.watchexec;
         redis = pkgs.redis;
         php  = phps.packages.${system}.php82;
@@ -93,6 +93,7 @@
           DBNAME = dbname;
           PHPFPMPORT = phpfpmport;
           REDISPORT = redisport;
+          NODE_OPTIONS= "--openssl-legacy-provider";
           INSTALL_URL = "http://localhost:8050";
           CYPRESS_dbHost = hostname;
           CYPRESS_dbUser = dbuser;
@@ -198,6 +199,7 @@
             if ! [ -e .shopwareinstalled ]; then
               cp -r ${shopware}/. $HOME/
               cat ${dotenv}/.env | envsubst > .env
+              mkdir custom
               mkdir var
               mkdir files
               chmod -R 755 public
@@ -205,10 +207,11 @@
               chmod -R 755 var
               chmod -R 755 files
               chmod -R 755 src
+              chmod -R 755 custom
               composer install
-              composer install --working-dir=$HOME/src/WebInstaller
               php -d memory_limit=6G bin/console system:install --basic-setup --create-database --force
               bin/console bundle:dump
+              bin/console feature:dump
               npm --prefix src/Administration/Resources/app/administration/ install
               PROJECT_ROOT=$HOME ENV_FILE=$HOME/.env npm run --prefix src/Administration/Resources/app/administration/ build
               npm --prefix src/Storefront/Resources/app/storefront install

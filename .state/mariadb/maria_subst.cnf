@@ -1,0 +1,10 @@
+[client]
+socket=$HOME/.state/mariadb/tmp/mysql.sock
+port=3306
+
+[mysqld]
+language=$HOME/.state/mariadb/english
+socket=$HOME/.state/mariadb/tmp/mysql.sock
+port=3306
+bind-address=$DBHOST
+general-log

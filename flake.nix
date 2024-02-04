@@ -10,7 +10,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     phps.url = "github:fossar/nix-phps?rev=d242ccad64fbbd1f44ddc96d6510904922a4e3d1"; 
     shopware = {
-      url = "github:shopware/shopware?ref=v6.5.7.3";
+      url = "github:shopware/shopware?ref=v6.4.20.2";
       flake = false;
     };
   };
@@ -20,8 +20,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         pkgs_latest = nixpkgs_latest.legacyPackages.${system};
         helix = pkgs_latest.helix;
-        # node16 = pkgs.nodejs_16.overrideAttrs (o: {meta = o.meta // {knownVulnerabilities = [];};});
-        node = pkgs.nodejs_18;
+        node = pkgs.nodejs_16.overrideAttrs (o: {meta = o.meta // {knownVulnerabilities = [];};});
         watchexec = pkgs.watchexec;
         redis = pkgs.redis;
         php = phps.packages.${system}.php82;
@@ -58,7 +57,6 @@
             composer
             fish
             node
-            # node16
             pnpm
             mariadb
             envsubst

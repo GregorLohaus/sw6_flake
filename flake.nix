@@ -10,7 +10,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     phps.url = "github:fossar/nix-phps?rev=d242ccad64fbbd1f44ddc96d6510904922a4e3d1"; 
     shopware = {
-      url = "github:shopware/shopware?ref=v6.5.7.3";
+      url = "github:shopware/shopware?ref=v6.5.6.0";
       flake = false;
     };
   };
@@ -41,10 +41,11 @@
         dbuser = "shopware";
         dbpass = "shopware";
         dbhost = "127.0.0.1";
-        dbport = "3306";
-        phpfpmport = "9123";
+        dbport = "3307";
+        phpfpmport = "9124";
         redisport = "7777";
         hostname = "localhost";
+        port = "8081";
       in {
         devShell = pkgs.mkShell {
           buildInputs = [
@@ -71,7 +72,8 @@
           HOSTNAME = hostname;
           DBHOST = dbhost;
           NODE_OPTIONS= "--openssl-legacy-provider";
-          APP_URL = "http://${hostname}:8080";
+          SW_PORT= port;
+          APP_URL = "http://${hostname}:${port}";
           DATABASE_URL = "mysql://${dbuser}:${dbpass}@${dbhost}:${dbport}/${dbname}";
           shellHook = "
               if ! [ -e flake.nix ]; then

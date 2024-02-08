@@ -71,6 +71,7 @@
           REDISPORT = redisport;
           HOSTNAME = hostname;
           DBHOST = dbhost;
+          DBPORT = dbport;
           NODE_OPTIONS= "--openssl-legacy-provider";
           SW_PORT= port;
           APP_URL = "http://${hostname}:${port}";

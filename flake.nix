@@ -70,6 +70,7 @@
           REDISPORT = redisport;
           HOSTNAME = hostname;
           DBHOST = dbhost;
+          DBPORT = dbport;
           NODE_OPTIONS= "--openssl-legacy-provider";
           APP_URL = "http://${hostname}:8080";
           DATABASE_URL = "mysql://${dbuser}:${dbpass}@${dbhost}:${dbport}/${dbname}";

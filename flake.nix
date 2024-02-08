@@ -42,7 +42,7 @@
         dbpass = "shopware";
         dbhost = "127.0.0.1";
         dbport = "3306";
-        phpfpmport = "9123";
+        phpfpmport = "9999";
         redisport = "7777";
         hostname = "localhost";
       in {
